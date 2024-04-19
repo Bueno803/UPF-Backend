@@ -16,18 +16,19 @@ async function bootstrap() {
   //   } as Partial<admin.ServiceAccount>),
   //   databaseURL: process.env.DATABASE_URL
   // })
-  app.use(cors({
-    methods: ['GET', 'PUT', 'POST'],
-    origin: ['http://localhost:8100', 'http://127.0.0.1:8100'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
-    // origin: allowedOrigins,
-  }))
-  app.use(express.urlencoded({extended: true}));
+  app.use(
+    cors({
+      methods: ['GET', 'PUT', 'POST'],
+      origin: ['http://localhost:8100', 'http://127.0.0.1:8100'],
+      credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
+      // origin: allowedOrigins,
+    }),
+  );
+  app.use(express.urlencoded({ extended: true }));
   await app.listen(3000, () => {
     console.log('The application is running on localhost:3000!');
   });
-
 }
 
 bootstrap();
