@@ -9,35 +9,45 @@ export class ClientsService {
   async createClient(clientInfo: any): Promise<any> {
     // check user existence?
     try {
+        let response;
       const docRef = await admin.firestore().collection('client_space');
       await docRef
         .where('FirstName', '==', clientInfo.FirstName)
         .get()
-        .then((result) => {
-          result.forEach((doc) => {
-            console.log('document: ', doc);
-          });
+        .then(async (result) => {
+            if(result.empty) {
+                console.log("empty");
+                await docRef.doc().set(clientInfo).then((data) => {
+                    console.log("set client: ", data);
+                    response = {clientExists: false};
+                });
+            } else {
+            console.log("not empty");
+                result.forEach((doc) => {
+                    response = {clientExists: true, client: doc.data()};
+                });
+            }
         });
-      //   const quierySnapshot = await getDocs(result);
-      //   console.log('result: ', quierySnapshot);
-      //   await docRef.get().then(async (clients) => {
-      //     clients.data().data.forEach((client) => {
-      //       if (
-      //         clientInfo.firstname == client.FirstName &&
-      //         clientInfo.lastname == client.LastName
-      //       ) {
-      //         return { resData: 'user exists', client: client };
-      //       }
-      //       console.log('individual clients: ', client);
-      //     });
-      //     // console.log("3 ", clients.data().data[0]);
-      //     // console.log("1 ", clients);
-      //     await docRef.set(clientInfo).then(() => {
-      //       return { resData: 'success' };
-      //     });
-      //   });
+        return response;
     } catch (error) {
       console.log('An error occured creating client: ', error);
+    }
+  }
+
+  async getLocations() {
+    try {
+        let response;
+        await admin.firestore().collection('upf_locations').get().then((data) => {
+            data.forEach((doc) => {
+                response =  doc.data();
+                // console.log("doc: ", doc.data());
+            });
+        });
+        return response;
+    } catch (error) {
+        console.log("An error occurred getting service locations: ", error);
+        return {errorStatus: 'No locations', error: error}; 
+        
     }
   }
 }

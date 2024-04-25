@@ -26,25 +26,40 @@ export class ClientsController {
     @Body() userDto: any,
   ) {
     try {
-      const clients = await this.clientsService
+      await this.clientsService
         .createClient(userDto)
-        .then(() => {
-          // console.log("resUser: ", resClient);
-          // if(resClient.resData == 'user exists') {
-          //     return response.status(HttpStatus.CONFLICT).json({
-          //         message: 'User already exists',
-          //         data: resClient.client
-          //     });
-          // } else {
-          //     return response.status(HttpStatus.OK).json({
-          //         message: 'User successfully created',
-          //         resClient
-          //     });
-          // }
+        .then((resClient) => {
+          console.log("resClient: ", resClient);
+          if(resClient.clientExists) {
+              return response.status(HttpStatus.CONFLICT).json({
+                  message: 'User already exists',
+                  data: resClient.client
+              });
+          } else {
+              return response.status(HttpStatus.OK).json({
+                  message: 'User successfully created',
+                  resClient
+              });
+          }
         });
     } catch (error) {
       console.log('error: ', error);
     }
     return null;
+  }
+
+  @Get('/locations')
+  async getLocations(@Res() response) {
+    try {
+        await this.clientsService.getLocations().then((locations) => {
+            if (response.errorStatus) {
+                return response.status(HttpStatus.CONFLICT).json({locations});
+            }
+            return response.status(HttpStatus.OK).json({locations});
+        });
+    } catch (error) {
+        console.log("An error occurred returning locations: ", error);
+        return response.status(HttpStatus.CONFLICT).json({error});
+    }
   }
 }
