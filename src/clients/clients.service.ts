@@ -9,26 +9,29 @@ export class ClientsService {
   async createClient(clientInfo: any): Promise<any> {
     // check user existence?
     try {
-        let response;
+      let response;
       const docRef = await admin.firestore().collection('client_space');
       await docRef
         .where('FirstName', '==', clientInfo.FirstName)
         .get()
         .then(async (result) => {
-            if(result.empty) {
-                console.log("empty");
-                await docRef.doc().set(clientInfo).then((data) => {
-                    console.log("set client: ", data);
-                    response = {clientExists: false};
-                });
-            } else {
-            console.log("not empty");
-                result.forEach((doc) => {
-                    response = {clientExists: true, client: doc.data()};
-                });
-            }
+          if (result.empty) {
+            console.log('empty');
+            await docRef
+              .doc()
+              .set(clientInfo)
+              .then((data) => {
+                console.log('set client: ', data);
+                response = { clientExists: false };
+              });
+          } else {
+            console.log('not empty');
+            result.forEach((doc) => {
+              response = { clientExists: true, client: doc.data() };
+            });
+          }
         });
-        return response;
+      return response;
     } catch (error) {
       console.log('An error occured creating client: ', error);
     }
@@ -36,18 +39,81 @@ export class ClientsService {
 
   async getLocations() {
     try {
-        let response;
-        await admin.firestore().collection('upf_locations').get().then((data) => {
-            data.forEach((doc) => {
-                response =  doc.data();
-                // console.log("doc: ", doc.data());
-            });
+      const response = [];
+      await admin
+        .firestore()
+        .collection('upf_locations')
+        .get()
+        .then((data) => {
+          data.forEach((doc) => {
+            response.push(doc.data());
+            // console.log("doc: ", doc.data());
+          });
+          // console.log('r ', response);
         });
-        return response;
+      return response;
     } catch (error) {
-        console.log("An error occurred getting service locations: ", error);
-        return {errorStatus: 'No locations', error: error}; 
-        
+      console.log('An error occurred getting service locations: ', error);
+      return { errorStatus: 'No locations', error: error };
+    }
+  }
+
+  async addLocation(newLoc: any) {
+    try {
+      let response;
+      const docRef = await admin.firestore().collection('upf_locations');
+      await docRef
+        .where('LocationName', '==', newLoc.LocationName)
+        .get()
+        .then(async (result) => {
+          if (result.empty) {
+            console.log('empty');
+            const docId = await docRef.doc();
+            const newLocation = {
+              id: docId.id,
+              LocationName: newLoc.LocationName,
+            };
+            await docId.set(newLocation).then((data) => {
+              console.log('set client: ', data);
+              response = newLocation;
+            });
+          } else {
+            console.log('not empty');
+            response = null;
+          }
+        });
+      console.log('returning: ', response);
+      return response;
+    } catch (error) {
+      console.log('An error occurred on adding location: ', error);
+      return error;
+    }
+  }
+
+  async removeLocation(newLoc: any) {
+    try {
+      let response;
+      const docRef = await admin.firestore().collection('upf_locations');
+      await docRef
+        .where('LocationName', '==', newLoc.LocationName)
+        .get()
+        .then(async (result) => {
+          if (result.empty) {
+            response = { message: 'Location does not exist...' };
+          } else {
+            await docRef
+              .doc(newLoc.id)
+              .delete()
+              .catch((error) => {
+                response = error;
+              });
+          }
+        });
+      console.log('the response: ', response);
+      return response;
+    } catch (error) {
+      console.log('An error occurred on adding location: ', error);
+      return error;
     }
   }
 }
