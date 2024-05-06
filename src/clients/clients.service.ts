@@ -6,6 +6,21 @@ import * as admin from 'firebase-admin';
 export class ClientsService {
   constructor() {}
 
+  async getClients() {
+    try {
+      const response = [];
+      const docRef = await admin.firestore().collection('client_space');
+      await docRef.get().then(async (result) => {
+        result.forEach((doc) => {
+          response.push(doc.data());
+        });
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
+
   async createClient(clientInfo: any): Promise<any> {
     // check user existence?
     try {
@@ -13,6 +28,7 @@ export class ClientsService {
       const docRef = await admin.firestore().collection('client_space');
       await docRef
         .where('FirstName', '==', clientInfo.FirstName)
+        .where('LastName', '==', clientInfo.LastName)
         .get()
         .then(async (result) => {
           if (result.empty) {

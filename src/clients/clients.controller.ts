@@ -16,7 +16,15 @@ export class ClientsController {
   @Get('/all')
   async getClients(@Res() response) {
     try {
-    } catch (error) {}
+      await this.clientsService.getClients().then((resClients) => {
+        console.log(resClients);
+        return response.status(HttpStatus.OK).json({
+          clients: resClients,
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @Post('/create')
