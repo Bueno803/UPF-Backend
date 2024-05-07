@@ -36,14 +36,42 @@ export class ClientsController {
     try {
       await this.clientsService.createClient(userDto).then((resClient) => {
         console.log('resClient: ', resClient);
-        if (resClient.clientExists) {
-          return response.status(HttpStatus.CONFLICT).json({
-            message: 'User already exists',
-            data: resClient.client,
-          });
-        } else {
+        if (resClient.clientCreated) {
           return response.status(HttpStatus.OK).json({
             message: 'User successfully created',
+            resClient,
+          });
+        } else {
+          return response.status(HttpStatus.CONFLICT).json({
+            message: 'User already exists',
+            resClient,
+          });
+        }
+      });
+    } catch (error) {
+      console.log('error: ', error);
+    }
+    return null;
+  }
+
+  @Post('/create-force')
+  async createClientAnyway(
+    @Res() response,
+    @Req() req: Request,
+    @Body() userDto: any,
+  ) {
+    try {
+      console.log("1createClientAnyway");
+      await this.clientsService.createClientAnyway(userDto).then((resClient) => {
+        console.log('resClient: ', resClient);
+        if (resClient.clientCreated) {
+          return response.status(HttpStatus.OK).json({
+            message: 'User successfully created',
+            resClient,
+          });
+        } else {
+          return response.status(HttpStatus.CONFLICT).json({
+            message: 'User already exists',
             resClient,
           });
         }

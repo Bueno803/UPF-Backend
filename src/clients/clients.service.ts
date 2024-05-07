@@ -32,25 +32,43 @@ export class ClientsService {
         .get()
         .then(async (result) => {
           if (result.empty) {
-            console.log('empty');
-            await docRef
-              .doc()
-              .set(clientInfo)
+            console.log('Client will Created');
+              await docRef.doc().set(clientInfo)
               .then((data) => {
                 console.log('set client: ', data);
-                response = { clientExists: false };
+                response = { clientCreated: true };
               });
           } else {
-            console.log('not empty');
-            result.forEach((doc) => {
-              response = { clientExists: true, client: doc.data() };
-            });
+            const docId = await docRef.doc();
+            clientInfo.ClientID = docId.id;
+
+            console.log('Client will not created');
+            // result.forEach((doc) => {
+              response = { clientCreated: false, client: clientInfo };
+            // });
           }
         });
       return response;
     } catch (error) {
       console.log('An error occured creating client: ', error);
     }
+  }
+
+  async createClientAnyway(clientInfo: any): Promise<any> {
+    // check user existence?
+    console.log("createClientAnyway");
+    try {
+      let response;
+      console.log("cc", clientInfo);
+    
+      await admin.firestore().collection('client_space').doc(clientInfo.ClientID).set(clientInfo).then((resData) => {
+        console.log("set client anyway: ", resData);
+        response = { clientCreated: true };
+      });
+      return response;
+    } catch (error) {
+      console.log('An error occured creating client: ', error);
+    } 
   }
 
   async getLocations() {
