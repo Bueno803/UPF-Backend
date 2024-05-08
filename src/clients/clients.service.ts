@@ -12,6 +12,7 @@ export class ClientsService {
       const docRef = await admin.firestore().collection('client_space');
       await docRef.get().then(async (result) => {
         result.forEach((doc) => {
+          // console.log('Test ', doc.data().FirstName, ' ', doc.data().ClientID);
           response.push(doc.data());
         });
       });
@@ -33,7 +34,9 @@ export class ClientsService {
         .then(async (result) => {
           if (result.empty) {
             console.log('Client will Created');
-              await docRef.doc().set(clientInfo)
+            await docRef
+              .doc()
+              .set(clientInfo)
               .then((data) => {
                 console.log('set client: ', data);
                 response = { clientCreated: true };
@@ -44,7 +47,7 @@ export class ClientsService {
 
             console.log('Client will not created');
             // result.forEach((doc) => {
-              response = { clientCreated: false, client: clientInfo };
+            response = { clientCreated: false, client: clientInfo };
             // });
           }
         });
@@ -56,19 +59,51 @@ export class ClientsService {
 
   async createClientAnyway(clientInfo: any): Promise<any> {
     // check user existence?
-    console.log("createClientAnyway");
+    console.log('createClientAnyway');
     try {
       let response;
-      console.log("cc", clientInfo);
-    
-      await admin.firestore().collection('client_space').doc(clientInfo.ClientID).set(clientInfo).then((resData) => {
-        console.log("set client anyway: ", resData);
-        response = { clientCreated: true };
-      });
+      console.log('cc', clientInfo);
+
+      await admin
+        .firestore()
+        .collection('client_space')
+        .doc(clientInfo.ClientID)
+        .set(clientInfo)
+        .then((resData) => {
+          console.log('set client anyway: ', resData);
+          response = { clientCreated: true };
+        });
       return response;
     } catch (error) {
       console.log('An error occured creating client: ', error);
-    } 
+    }
+  }
+
+  async updateClient(clientID: string, client: any) {
+    try {
+      const docRef = await admin.firestore().collection('client_space');
+      docRef.doc(clientID).update({
+        // 'ClientID': client.ClientID,
+        FirstName: client.FirstName,
+        MiddleName: client.MiddleName,
+        LastName: client.LastName,
+        Age: client.Age,
+        BeltLvl: client.BeltLvl,
+        City: client.City,
+        ClientType: client.ClientType,
+        Email: client.Email,
+        Gender: client.Gender,
+        HomeNumber: client.HomeNumber,
+        Location: client.Location,
+        PhoneNumber: client.PhoneNumber,
+        State: client.State,
+        StreetAddress: client.StreetAddress,
+      });
+      return { updateStatus: true };
+    } catch (error) {
+      console.log('An error occurred updating client: ', error);
+      return { updateStatus: false, error };
+    }
   }
 
   async getLocations() {

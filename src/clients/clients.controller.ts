@@ -17,7 +17,10 @@ export class ClientsController {
   async getClients(@Res() response) {
     try {
       await this.clientsService.getClients().then((resClients) => {
-        console.log(resClients);
+        resClients.forEach((data) => {
+          console.log(data.FirstName, ' ', data.ClientID);
+        });
+        // console.log(resClients[0].FirstName, ' ', resClients[0].ClientID);
         return response.status(HttpStatus.OK).json({
           clients: resClients,
         });
@@ -61,25 +64,48 @@ export class ClientsController {
     @Body() userDto: any,
   ) {
     try {
-      console.log("1createClientAnyway");
-      await this.clientsService.createClientAnyway(userDto).then((resClient) => {
-        console.log('resClient: ', resClient);
-        if (resClient.clientCreated) {
-          return response.status(HttpStatus.OK).json({
-            message: 'User successfully created',
-            resClient,
-          });
-        } else {
-          return response.status(HttpStatus.CONFLICT).json({
-            message: 'User already exists',
-            resClient,
-          });
-        }
-      });
+      console.log('1createClientAnyway');
+      await this.clientsService
+        .createClientAnyway(userDto)
+        .then((resClient) => {
+          console.log('resClient: ', resClient);
+          if (resClient.clientCreated) {
+            return response.status(HttpStatus.OK).json({
+              message: 'User successfully created',
+              resClient,
+            });
+          } else {
+            return response.status(HttpStatus.CONFLICT).json({
+              message: 'User already exists',
+              resClient,
+            });
+          }
+        });
     } catch (error) {
       console.log('error: ', error);
     }
     return null;
+  }
+
+  @Post('/update')
+  async clientUpdate(@Res() response, @Body() client: any) {
+    try {
+      console.log('UpdateClient');
+      const { ClientID, Client } = client;
+      await this.clientsService
+        .updateClient(ClientID, Client)
+        .then((resData) => {
+          if (resData.updateStatus) {
+            return response.status(HttpStatus.OK).json({
+              resData,
+            });
+          } else {
+            return response.status(HttpStatus.CONFLICT).json({
+              resData,
+            });
+          }
+        });
+    } catch (error) {}
   }
 
   @Get('/locations')
