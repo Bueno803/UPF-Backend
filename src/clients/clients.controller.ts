@@ -125,9 +125,9 @@ export class ClientsController {
   }
 
   @Post('/locations/add')
-  async addLocation(@Res() response, @Body() userDto: any) {
+  async addLocation(@Res() response, @Body() location: any) {
     try {
-      await this.clientsService.addLocation(userDto).then((resData) => {
+      await this.clientsService.addLocation(location).then((resData) => {
         if (resData == null) {
           return response
             .status(HttpStatus.CONFLICT)
@@ -143,10 +143,10 @@ export class ClientsController {
   }
 
   @Post('/locations/remove')
-  async removeLocation(@Res() response, @Body() userDto: any) {
+  async removeLocation(@Res() response, @Body() location: any) {
     try {
-      console.log('remove loc: ', userDto);
-      await this.clientsService.removeLocation(userDto).then((resData) => {
+      console.log('remove loc: ', location);
+      await this.clientsService.removeLocation(location).then((resData) => {
         if (resData != null) {
           return response.status(HttpStatus.CONFLICT).json(resData);
         } else {
