@@ -79,29 +79,19 @@ export class ClientsService {
     }
   }
 
-  async updateClient(clientID: string, client: any) {
+  async updateClient(client: any) {
     try {
       const docRef = await admin.firestore().collection('client_space');
-      docRef.doc(clientID).update({
-        // 'ClientID': client.ClientID,
-        FirstName: client.FirstName,
-        MiddleName: client.MiddleName,
-        LastName: client.LastName,
-        Age: client.Age,
-        BeltLvl: client.BeltLvl,
-        City: client.City,
-        ClientType: client.ClientType,
-        Email: client.Email,
-        Gender: client.Gender,
-        HomeNumber: client.HomeNumber,
-        Location: client.Location,
-        PhoneNumber: client.PhoneNumber,
-        State: client.State,
-        StreetAddress: client.StreetAddress,
-      });
+      const cleanClient = client;
+
+      Object.keys(cleanClient).forEach((key) =>
+        cleanClient[key] === undefined ? delete cleanClient[key] : {},
+      );
+
+      docRef.doc(client.ClientID).update(cleanClient);
       return { updateStatus: true };
     } catch (error) {
-      console.log('An error occurred updating client: ', error);
+      console.log('An error occurred update client: ', error);
       return { updateStatus: false, error };
     }
   }

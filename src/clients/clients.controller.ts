@@ -91,20 +91,19 @@ export class ClientsController {
   async clientUpdate(@Res() response, @Body() client: any) {
     try {
       console.log('UpdateClient');
-      const { ClientID, Client } = client;
-      await this.clientsService
-        .updateClient(ClientID, Client)
-        .then((resData) => {
-          if (resData.updateStatus) {
-            return response.status(HttpStatus.OK).json({
-              resData,
-            });
-          } else {
-            return response.status(HttpStatus.CONFLICT).json({
-              resData,
-            });
-          }
-        });
+      // const { Client } = client;
+      console.log(client);
+      await this.clientsService.updateClient(client).then((resData) => {
+        if (resData.updateStatus) {
+          return response.status(HttpStatus.OK).json({
+            resData,
+          });
+        } else {
+          return response.status(HttpStatus.CONFLICT).json({
+            resData,
+          });
+        }
+      });
     } catch (error) {}
   }
 
@@ -119,7 +118,7 @@ export class ClientsController {
         return response.status(HttpStatus.OK).json({ locations });
       });
     } catch (error) {
-      console.log('An error occurred returning locations: ', error);
+      console.log('An error occurred return locations: ', error);
       return response.status(HttpStatus.CONFLICT).json({ error });
     }
   }
