@@ -36,11 +36,10 @@ export class ClientsService {
           clientInfo.ClientID = docId.id;
           if (result.empty) {
             console.log('Client will Created');
-              await docId.set(clientInfo)
-              .then((data) => {
-                console.log('set client: ', data);
-                response = { clientCreated: true };
-              });
+            await docId.set(clientInfo).then((data) => {
+              console.log('set client: ', data);
+              response = { clientCreated: true };
+            });
           } else {
             console.log('Client will not created');
             // result.forEach((doc) => {
@@ -85,7 +84,7 @@ export class ClientsService {
         cleanClient[key] === undefined ? delete cleanClient[key] : {},
       );
 
-      console.log("Clean Client: ", cleanClient);
+      console.log('Clean Client: ', cleanClient);
       docRef.doc(client.ClientID).update(cleanClient);
       return { updateStatus: true };
     } catch (error) {
@@ -96,9 +95,40 @@ export class ClientsService {
 
   async disableClient(clientID: string, disabledTimeStamp: string) {
     try {
+      let response;
       const docRef = await admin.firestore().collection('client_space');
-      docRef.doc(clientID).update({lastDisabled: disabledTimeStamp, isActive: false});
-      return { updateStatus: true };
+      docRef
+        .doc(clientID)
+        .update({ lastDisabled: disabledTimeStamp, isActive: false });
+      await docRef
+        .where('ClientID', '==', clientID)
+        .get()
+        .then(async (result) => {
+          result.forEach((client) => {
+            response = client.data();
+          });
+        });
+      return { updateStatus: true, response };
+    } catch (error) {
+      console.log('An error occurred update client: ', error);
+      return { updateStatus: false, error };
+    }
+  }
+
+  async enableClient(clientID: string) {
+    try {
+      let response;
+      const docRef = await admin.firestore().collection('client_space');
+      docRef.doc(clientID).update({ lastDisabled: null, isActive: true });
+      await docRef
+        .where('ClientID', '==', clientID)
+        .get()
+        .then(async (result) => {
+          result.forEach((client) => {
+            response = client.data();
+          });
+        });
+      return { updateStatus: true, response };
     } catch (error) {
       console.log('An error occurred update client: ', error);
       return { updateStatus: false, error };

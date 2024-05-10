@@ -111,26 +111,48 @@ export class ClientsController {
   async disableClient(@Res() response, @Body() data: any) {
     try {
       console.log('/disable client');
-      await this.clientsService.disableClient(data.ClientID, data.disabledTimeStamp).then((resData) => {
+      await this.clientsService
+        .disableClient(data.ClientID, data.disabledTimeStamp)
+        .then((resData) => {
+          if (resData.updateStatus) {
+            console.log('disableClient: ', resData);
+            return response.status(HttpStatus.OK).json({
+              resData,
+            });
+          } else {
+            console.log('disableClient: ', resData);
+            return response.status(HttpStatus.CONFLICT).json({
+              resData,
+            });
+          }
+        });
+    } catch (error) {}
+  }
+
+  @Post('/enable')
+  async enableClient(@Res() response, @Body() data: any) {
+    try {
+      console.log('/disable client');
+      await this.clientsService.enableClient(data.ClientID).then((resData) => {
         if (resData.updateStatus) {
+          console.log('disableClient: ', resData);
           return response.status(HttpStatus.OK).json({
             resData,
           });
         } else {
+          console.log('disableClient: ', resData);
           return response.status(HttpStatus.CONFLICT).json({
             resData,
           });
         }
-      })
-    } catch (error) {
-      
-    }
+      });
+    } catch (error) {}
   }
 
   @Get('/locations')
   async getLocations(@Res() response) {
     try {
-      console.log("/locations")
+      console.log('/locations');
       await this.clientsService.getLocations().then((locations) => {
         if (response.errorStatus) {
           return response.status(HttpStatus.CONFLICT).json({ locations });
