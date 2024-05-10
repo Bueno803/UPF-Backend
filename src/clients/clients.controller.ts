@@ -90,7 +90,7 @@ export class ClientsController {
   @Post('/update')
   async clientUpdate(@Res() response, @Body() client: any) {
     try {
-      console.log('UpdateClient');
+      console.log('UpdateClien');
       // const { Client } = client;
       console.log(client);
       await this.clientsService.updateClient(client).then((resData) => {
@@ -107,9 +107,30 @@ export class ClientsController {
     } catch (error) {}
   }
 
+  @Post('/disable')
+  async disableClient(@Res() response, @Body() data: any) {
+    try {
+      console.log('/disable client');
+      await this.clientsService.disableClient(data.ClientID, data.disabledTimeStamp).then((resData) => {
+        if (resData.updateStatus) {
+          return response.status(HttpStatus.OK).json({
+            resData,
+          });
+        } else {
+          return response.status(HttpStatus.CONFLICT).json({
+            resData,
+          });
+        }
+      })
+    } catch (error) {
+      
+    }
+  }
+
   @Get('/locations')
   async getLocations(@Res() response) {
     try {
+      console.log("/locations")
       await this.clientsService.getLocations().then((locations) => {
         if (response.errorStatus) {
           return response.status(HttpStatus.CONFLICT).json({ locations });

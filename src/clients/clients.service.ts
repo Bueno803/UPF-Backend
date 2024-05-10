@@ -32,19 +32,16 @@ export class ClientsService {
         .where('LastName', '==', clientInfo.LastName)
         .get()
         .then(async (result) => {
+          const docId = await docRef.doc();
+          clientInfo.ClientID = docId.id;
           if (result.empty) {
             console.log('Client will Created');
-            await docRef
-              .doc()
-              .set(clientInfo)
+              await docId.set(clientInfo)
               .then((data) => {
                 console.log('set client: ', data);
                 response = { clientCreated: true };
               });
           } else {
-            const docId = await docRef.doc();
-            clientInfo.ClientID = docId.id;
-
             console.log('Client will not created');
             // result.forEach((doc) => {
             response = { clientCreated: false, client: clientInfo };
@@ -88,7 +85,19 @@ export class ClientsService {
         cleanClient[key] === undefined ? delete cleanClient[key] : {},
       );
 
+      console.log("Clean Client: ", cleanClient);
       docRef.doc(client.ClientID).update(cleanClient);
+      return { updateStatus: true };
+    } catch (error) {
+      console.log('An error occurred update client: ', error);
+      return { updateStatus: false, error };
+    }
+  }
+
+  async disableClient(clientID: string, disabledTimeStamp: string) {
+    try {
+      const docRef = await admin.firestore().collection('client_space');
+      docRef.doc(clientID).update({lastDisabled: disabledTimeStamp, isActive: false});
       return { updateStatus: true };
     } catch (error) {
       console.log('An error occurred update client: ', error);
