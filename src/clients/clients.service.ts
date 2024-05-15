@@ -145,6 +145,7 @@ export class ClientsService {
         .then(async (result) => {
           result.forEach((clients) => {
             if (clients.data().lastDisabled < deleteDate) {
+              // need values in db with millisecond time dates
               console.log('test date old new');
               // docRef.doc().delete();
             }

@@ -150,8 +150,8 @@ export class ClientsController {
     } catch (error) {}
   }
 
-  @Delete('/purge')
-  async purgeInactives(@Res() response, @Body() data) {
+  @Post('/purge')
+  async purgeInactives( @Res() response, @Body() data) {
     try {
       console.log('/purge');
       console.log(data);
