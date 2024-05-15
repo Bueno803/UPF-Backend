@@ -18,8 +18,13 @@ async function bootstrap() {
   // })
   app.use(
     cors({
-      methods: ['GET', 'PUT', 'POST'],
-      origin: ['http://localhost:8100', 'http://127.0.0.1:8100', 'http://localhost:4200', 'http://127.0.0.1:4200'],
+      methods: ['GET', 'PUT', 'POST', 'DELETE'],
+      origin: [
+        'http://localhost:8100',
+        'http://127.0.0.1:8100',
+        'http://localhost:4200',
+        'http://127.0.0.1:4200',
+      ],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
       // origin: allowedOrigins,

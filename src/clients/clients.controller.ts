@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Post,
@@ -146,6 +147,19 @@ export class ClientsController {
           });
         }
       });
+    } catch (error) {}
+  }
+
+  @Delete('/purge')
+  async purgeInactives(@Res() response, @Body() data) {
+    try {
+      console.log('/purge');
+      console.log(data);
+      await this.clientsService
+        .purgeInactives(data.dateData)
+        .then((resData) => {
+          return response.status(HttpStatus.OK).json(resData);
+        });
     } catch (error) {}
   }
 

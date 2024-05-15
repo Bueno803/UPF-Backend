@@ -93,7 +93,7 @@ export class ClientsService {
     }
   }
 
-  async disableClient(clientID: string, disabledTimeStamp: string) {
+  async disableClient(clientID: string, disabledTimeStamp: number) {
     try {
       let response;
       const docRef = await admin.firestore().collection('client_space');
@@ -133,6 +133,27 @@ export class ClientsService {
       console.log('An error occurred update client: ', error);
       return { updateStatus: false, error };
     }
+  }
+
+  async purgeInactives(deleteDate: number) {
+    try {
+      console.log(deleteDate);
+      const docRef = await admin.firestore().collection('client_space');
+      await docRef
+        .where('isActive', '==', false)
+        .get()
+        .then(async (result) => {
+          result.forEach((clients) => {
+            if (clients.data().lastDisabled < deleteDate) {
+              console.log('test date old new');
+              // docRef.doc().delete();
+            }
+            console.log('this clients name: ', clients.data().FirstName);
+            console.log(clients.data());
+            // response = client.data();
+          });
+        });
+    } catch (error) {}
   }
 
   async getLocations() {
