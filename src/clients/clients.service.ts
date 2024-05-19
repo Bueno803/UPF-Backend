@@ -137,6 +137,7 @@ export class ClientsService {
 
   async purgeInactives(deleteDate: number) {
     try {
+      const poppedClients = [];
       console.log(deleteDate);
       const docRef = await admin.firestore().collection('client_space');
       await docRef
@@ -144,17 +145,28 @@ export class ClientsService {
         .get()
         .then(async (result) => {
           result.forEach((clients) => {
+            console.log(
+              'lastDisabled: ',
+              clients.data().lastDisabled,
+              ' deleteData: ',
+              deleteDate,
+            );
             if (clients.data().lastDisabled < deleteDate) {
-              // need values in db with millisecond time dates
-              console.log('test date old new');
-              // docRef.doc().delete();
+              console.log('delete inside');
+              poppedClients.push({ ClientID: clients.data().ClientID });
+              docRef.doc(clients.data().ClientID).delete();
             }
-            console.log('this clients name: ', clients.data().FirstName);
-            console.log(clients.data());
+            // console.log('this clients name: ', clients.data().FirstName);
+            // console.log(clients.data());
             // response = client.data();
           });
         });
-    } catch (error) {}
+      console.log(poppedClients);
+      return poppedClients;
+    } catch (error) {
+      console.log('An error occurred purging clients: ', error);
+      return error;
+    }
   }
 
   async getLocations() {
@@ -174,6 +186,29 @@ export class ClientsService {
       return response;
     } catch (error) {
       console.log('An error occurred getting service locations: ', error);
+      return { errorStatus: 'No locations', error: error };
+    }
+  }
+
+  async getServiceTypes() {
+    try {
+      const response = [];
+      await admin
+        .firestore()
+        .collection('service_type')
+        .get()
+        .then((data) => {
+          console.log('service_types data ', data);
+          data.forEach((doc) => {
+            console.log('service_types doc ', doc);
+            response.push(doc.data());
+            // console.log("doc: ", doc.data());
+          });
+          // console.log('r ', response);
+        });
+      return response;
+    } catch (error) {
+      console.log('An error occurred getting service types: ', error);
       return { errorStatus: 'No locations', error: error };
     }
   }

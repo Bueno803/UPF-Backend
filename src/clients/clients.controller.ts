@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpStatus,
   Post,
@@ -151,7 +150,7 @@ export class ClientsController {
   }
 
   @Post('/purge')
-  async purgeInactives( @Res() response, @Body() data) {
+  async purgeInactives(@Res() response, @Body() data) {
     try {
       console.log('/purge');
       console.log(data);
@@ -160,7 +159,10 @@ export class ClientsController {
         .then((resData) => {
           return response.status(HttpStatus.OK).json(resData);
         });
-    } catch (error) {}
+    } catch (error) {
+      console.log('An error occurred purging clients: ', error);
+      return response.status(HttpStatus.CONFLICT).json(error);
+    }
   }
 
   @Get('/locations')
@@ -176,6 +178,23 @@ export class ClientsController {
       });
     } catch (error) {
       console.log('An error occurred return locations: ', error);
+      return response.status(HttpStatus.CONFLICT).json({ error });
+    }
+  }
+
+  @Get('/servicetypes')
+  async getServiceTypes(@Res() response) {
+    try {
+      console.log('/servicetypes');
+      await this.clientsService.getServiceTypes().then((serviceTypes) => {
+        if (response.errorStatus) {
+          return response.status(HttpStatus.CONFLICT).json({ serviceTypes });
+        }
+        // console.log('locs: ', locations);
+        return response.status(HttpStatus.OK).json({ serviceTypes });
+      });
+    } catch (error) {
+      console.log('An error occurred return serviceTypes: ', error);
       return response.status(HttpStatus.CONFLICT).json({ error });
     }
   }
