@@ -2,5 +2,26 @@
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "functions": [
+    {
+      "source": ".",
+      "codebase": "upf-backend",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
+  
+  "emulators": {
+    "firestore": {
+      "port": "5002"
+    }
   }
 }

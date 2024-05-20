@@ -12,7 +12,6 @@ export class ClientsService {
       const docRef = await admin.firestore().collection('client_space');
       await docRef.get().then(async (result) => {
         result.forEach((doc) => {
-          // console.log('Test ', doc.data().FirstName, ' ', doc.data().ClientID);
           response.push(doc.data());
         });
       });
@@ -35,16 +34,11 @@ export class ClientsService {
           const docId = await docRef.doc();
           clientInfo.ClientID = docId.id;
           if (result.empty) {
-            console.log('Client will Created');
-            await docId.set(clientInfo).then((data) => {
-              console.log('set client: ', data);
+            await docId.set(clientInfo).then(() => {
               response = { clientCreated: true };
             });
           } else {
-            console.log('Client will not created');
-            // result.forEach((doc) => {
             response = { clientCreated: false, client: clientInfo };
-            // });
           }
         });
       return response;
@@ -54,12 +48,8 @@ export class ClientsService {
   }
 
   async createClientAnyway(clientInfo: any): Promise<any> {
-    // check user existence?
-    console.log('createClientAnyway');
     try {
       let response;
-      console.log('cc', clientInfo);
-
       await admin
         .firestore()
         .collection('client_space')
@@ -156,9 +146,6 @@ export class ClientsService {
               poppedClients.push({ ClientID: clients.data().ClientID });
               docRef.doc(clients.data().ClientID).delete();
             }
-            // console.log('this clients name: ', clients.data().FirstName);
-            // console.log(clients.data());
-            // response = client.data();
           });
         });
       console.log(poppedClients);
@@ -179,9 +166,7 @@ export class ClientsService {
         .then((data) => {
           data.forEach((doc) => {
             response.push(doc.data());
-            // console.log("doc: ", doc.data());
           });
-          // console.log('r ', response);
         });
       return response;
     } catch (error) {
@@ -202,7 +187,6 @@ export class ClientsService {
           data.forEach((doc) => {
             console.log('service_types doc ', doc);
             response.push(doc.data());
-            // console.log("doc: ", doc.data());
           });
           // console.log('r ', response);
         });

@@ -47,7 +47,7 @@ export class UsersController {
     }
 
     @Post('/auth-create')
-    async createAuthUser(@Res() response, @Req() req: Request, @Body() authUserDto: ICreatePassengerAuthModel): Promise<PassengerAuth> {
+    async createAuthUser(@Res() response, @Body() authUserDto: ICreatePassengerAuthModel): Promise<PassengerAuth> {
         // To-Do
         console.log("post /auth-create");
         try {
@@ -67,7 +67,6 @@ export class UsersController {
                                 message: `Email address ${email} already in use.`, 
                                 resData
                             });
-                            break;
                         case 'auth/phone-number-already-exists':
                         console.log();
                             return response.status(HttpStatus.OK).json({
@@ -75,7 +74,6 @@ export class UsersController {
                                 message: `Phone number ${phoneNumber} already in use.`, 
                                 resData
                             });
-                            break;
                         case 'auth/invalid-email':
                             console.log();
                             return response.status(HttpStatus.OK).json({
@@ -83,7 +81,6 @@ export class UsersController {
                                 message: `Email address ${email} is invalid.`, 
                                 resData
                             });
-                            break;
                         case 'auth/operation-not-allowed':
                             // console.log(`Error during sign up.`);
                             return response.status(HttpStatus.UNAUTHORIZED).json({
@@ -91,15 +88,12 @@ export class UsersController {
                                 message: `Error during sign up.`, 
                                 resData
                             });
-                            break;
                         case 'auth/invalid-password':
-                            
                             return response.status(HttpStatus.OK).json({
                                 errorStatusCode: 5,
                                 message: 'Password is not strong enough. Add additional characters including special characters and numbers.', 
                                 resData
                             });
-                            break;
                         default:
                             console.log(resData.message);
                             // console.log(user);
@@ -108,7 +102,6 @@ export class UsersController {
                                 message: 'User Successfully Created', 
                                 resData
                             });
-                            break;
                     }
                 } else {
                     return response.status(HttpStatus.OK).json({
@@ -116,7 +109,6 @@ export class UsersController {
                         message: 'User Successfully Created', 
                         resData
                 });
-                    
                 }
                 });
                 // console.log ("rD: ", returnData);
@@ -127,7 +119,7 @@ export class UsersController {
     }
 
     @Post('/create')
-    async createUser(@Res() response, @Req() req: Request, @Body() userDto: Passenger): Promise<Passenger> {
+    async createUser(@Res() response, @Body() userDto: Passenger): Promise<Passenger> {
         // To-Do
         console.log("post /create");
         try {
@@ -155,7 +147,7 @@ export class UsersController {
     }
 
     @Post('/loggin-update')
-    async userLogginTimeUpdate(@Res() response, @Req() req: Request, @Body() userDto: {uid: string,lastLoggedIn: Date}): Promise<Passenger> {
+    async userLogginTimeUpdate(@Res() response, @Body() userDto: {uid: string,lastLoggedIn: Date}): Promise<Passenger> {
         // To-Do
         console.log("post /loggin-update");
         try {
@@ -174,7 +166,7 @@ export class UsersController {
     }
 
     @Post('/update-phone')
-    async userPhoneUpdate(@Res() response, @Req() req: Request, @Body() userDto: {uid: string, phoneNumber: string}): Promise<Passenger> {
+    async userPhoneUpdate(@Res() response, @Body() userDto: {uid: string, phoneNumber: string}): Promise<Passenger> {
         // To-Do
         console.log("post /update-phone");
         try {

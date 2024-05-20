@@ -33,8 +33,7 @@ export class ClientsController {
   @Post('/create')
   async createClient(
     @Res() response,
-    @Req() req: Request,
-    @Body() userDto: any,
+    @Body() userDto: any
   ) {
     try {
       await this.clientsService.createClient(userDto).then((resClient) => {
@@ -60,8 +59,7 @@ export class ClientsController {
   @Post('/create-force')
   async createClientAnyway(
     @Res() response,
-    @Req() req: Request,
-    @Body() userDto: any,
+    @Body() userDto: any
   ) {
     try {
       console.log('1createClientAnyway');
