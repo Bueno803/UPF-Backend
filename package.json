@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@angular/fire": "^17.0.1",
+    "@google-cloud/functions-framework": "^3.4.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.0.0",

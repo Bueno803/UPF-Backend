@@ -6,9 +6,8 @@ export class ClientsController {
   constructor(private clientsService: ClientsService) {}
 
   @Get('/all')
-  async getClients(@Res() response) {
+  public async getClients(@Res() response) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       await this.clientsService.getClients().then((resClients) => {
         resClients.forEach((data) => {
           console.log(data.FirstName, ' ', data.ClientID);
@@ -26,7 +25,6 @@ export class ClientsController {
   @Post('/create')
   async createClient(@Res() response, @Body() userDto: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       await this.clientsService.createClient(userDto).then((resClient) => {
         console.log('resClient: ', resClient);
         if (resClient.clientCreated) {
@@ -50,7 +48,6 @@ export class ClientsController {
   @Post('/create-force')
   async createClientAnyway(@Res() response, @Body() userDto: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('1createClientAnyway');
       await this.clientsService
         .createClientAnyway(userDto)
@@ -77,7 +74,6 @@ export class ClientsController {
   @Post('/update')
   async clientUpdate(@Res() response, @Body() client: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('UpdateClien');
       // const { Client } = client;
       console.log(client);
@@ -98,7 +94,6 @@ export class ClientsController {
   @Post('/disable')
   async disableClient(@Res() response, @Body() data: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('/disable client');
       await this.clientsService
         .disableClient(data.ClientID, data.disabledTimeStamp)
@@ -121,7 +116,6 @@ export class ClientsController {
   @Post('/enable')
   async enableClient(@Res() response, @Body() data: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('/disable client');
       await this.clientsService.enableClient(data.ClientID).then((resData) => {
         if (resData.updateStatus) {
@@ -142,7 +136,6 @@ export class ClientsController {
   @Post('/purge')
   async purgeInactives(@Res() response, @Body() data) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('/purge');
       console.log(data);
       await this.clientsService
@@ -157,27 +150,25 @@ export class ClientsController {
   }
 
   @Get('/locations')
-  async getLocations(@Res() response) {
+  async getLocations(@Res() res) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('/locations');
       await this.clientsService.getLocations().then((locations) => {
-        if (response.errorStatus) {
-          return response.status(HttpStatus.CONFLICT).json({ locations });
+        if (res.errorStatus) {
+          return res.status(HttpStatus.CONFLICT).json({ locations });
         }
         // console.log('locs: ', locations);
-        return response.status(HttpStatus.OK).json({ locations });
+        return res.status(HttpStatus.OK).json({ locations });
       });
     } catch (error) {
       console.log('An error occurred return locations: ', error);
-      return response.status(HttpStatus.CONFLICT).json({ error });
+      return res.status(HttpStatus.CONFLICT).json({ error });
     }
   }
 
   @Get('/servicetypes')
   async getServiceTypes(@Res() response) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('/servicetypes');
       await this.clientsService.getServiceTypes().then((serviceTypes) => {
         if (response.errorStatus) {
@@ -195,7 +186,6 @@ export class ClientsController {
   @Post('/locations/add')
   async addLocation(@Res() response, @Body() location: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       await this.clientsService.addLocation(location).then((resData) => {
         if (resData == null) {
           return response
@@ -214,7 +204,6 @@ export class ClientsController {
   @Post('/locations/remove')
   async removeLocation(@Res() response, @Body() location: any) {
     try {
-      response.set('Access-Control-Allow-Origin', '*');
       console.log('remove loc: ', location);
       await this.clientsService.removeLocation(location).then((resData) => {
         if (resData != null) {
