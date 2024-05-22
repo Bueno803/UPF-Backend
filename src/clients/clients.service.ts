@@ -37,6 +37,13 @@ export class ClientsService {
             await docId.set(clientInfo).then(() => {
               response = { clientCreated: true };
             });
+            response.schedule = await this.addToSchedule({
+              ClientID: clientInfo.ClientID,
+              FirstName: clientInfo.FirstName,
+              LastName: clientInfo.LastName,
+              Age: clientInfo.Age,
+              BeltLvl: clientInfo.BeltLvl,
+            });
           } else {
             response = { clientCreated: false, client: clientInfo };
           }
@@ -44,6 +51,64 @@ export class ClientsService {
       return response;
     } catch (error) {
       console.log('An error occured creating client: ', error);
+    }
+  }
+
+  async addToSchedule(clientInfo: any) {
+    try {
+      let classByAge;
+      if (clientInfo.Age > 5) {
+        classByAge = true;
+      } else {
+        classByAge = false;
+      }
+      const isReadyRef = await admin.firestore().collection('test_ready');
+      const beltProgressRef = await admin
+        .firestore()
+        .collection('tkd_belttest_progress');
+      const scheduleRef = await admin
+        .firestore()
+        .collection('tkd_schedule_info');
+      await scheduleRef.doc(clientInfo.ClientID).set({
+        ClientID: clientInfo.ClientID,
+        FirstName: clientInfo.FirstName,
+        LastName: clientInfo.LastName,
+        Age: clientInfo.Age,
+        BeltLvl: clientInfo.BeltLvl,
+        isAdvanced: classByAge,
+        //want to keep track of the last 5 dates each student attended a class
+        Attendance: [
+          {
+            date1: 'N/A',
+            date2: 'N/A',
+            date3: 'N/A',
+            date4: 'N/A',
+            date5: 'N/A',
+          },
+        ],
+        Ready: false,
+      });
+      await beltProgressRef.doc(clientInfo.ClientID).set({
+        ClientID: clientInfo.ClientID,
+        BeltLvl: clientInfo.BeltLvl,
+        isAdvanced: classByAge,
+        FormsTID: 1,
+        BlocksTID: 1,
+        HandAtksTID: 1,
+        KicksTID: 1,
+        Present: false,
+      });
+      await isReadyRef.doc(clientInfo.ClientID).set({
+        ClientID: clientInfo.ClientID,
+        FormsRdy: 1,
+        BlocksRdy: 1,
+        HandAtksRdy: 1,
+        KicksRdy: 1,
+      });
+      return 'Successfully added to schedule!';
+    } catch (error) {
+      console.log('An error occurred adding client to schedule: ', error);
+      return error;
     }
   }
 
