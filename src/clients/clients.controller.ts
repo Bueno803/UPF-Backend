@@ -219,4 +219,15 @@ export class ClientsController {
       return response.status(HttpStatus.CONFLICT).json({ error });
     }
   }
+
+  @Get('/schedule')
+  async getSchedule(@Res() response) {
+    try {
+      await this.clientsService.getSchedule().then((resData) => {
+        return response.status(HttpStatus.OK).json(resData);
+      })
+    } catch (error) {
+      return response.status(HttpStatus.CONFLICT).json(error);
+    }
+  }
 }
