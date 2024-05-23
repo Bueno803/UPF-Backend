@@ -225,9 +225,24 @@ export class ClientsController {
     try {
       await this.clientsService.getSchedule().then((resData) => {
         return response.status(HttpStatus.OK).json(resData);
-      })
+      });
     } catch (error) {
       return response.status(HttpStatus.CONFLICT).json(error);
+    }
+  }
+
+  @Post('/custom/delete')
+  async deleteCustom(@Res() response) {
+    try {
+      // console.log('remove loc: ', location);
+      await this.clientsService.deleteCustom().then(() => {
+        return response
+          .status(HttpStatus.OK)
+          .json({ message: 'deleteCustom Deleted' });
+      });
+    } catch (error) {
+      console.log('An error occurred calling deleteCustom ', error);
+      return response.status(HttpStatus.CONFLICT).json({ error });
     }
   }
 }

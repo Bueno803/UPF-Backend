@@ -96,14 +96,14 @@ export class ClientsService {
         FormsTID: 1,
         BlocksTID: 1,
         HandAtksTID: 1,
-        KicksTID: 1
+        KicksTID: 1,
       });
       await isReadyRef.doc(clientInfo.ClientID).set({
         ClientID: clientInfo.ClientID,
         FormsRdy: 1,
         BlocksRdy: 1,
         HandAtksRdy: 1,
-        KicksRdy: 1
+        KicksRdy: 1,
       });
       return 'Successfully added to schedule!';
     } catch (error) {
@@ -124,7 +124,7 @@ export class ClientsService {
           console.log('set client anyway: ', resData);
           response = { clientCreated: true };
         });
-        response.schedule = await this.addToSchedule({
+      response.schedule = await this.addToSchedule({
         ClientID: clientInfo.ClientID,
         FirstName: clientInfo.FirstName,
         LastName: clientInfo.LastName,
@@ -339,7 +339,25 @@ export class ClientsService {
       });
       return response;
     } catch (error) {
-      console.log("An error occurred fetching the client schedule: ", error);
+      console.log('An error occurred fetching the client schedule: ', error);
+      return error;
+    }
+  }
+  async deleteCustom() {
+    try {
+      let response;
+      const docRef = await admin.firestore().collection('tkd_schedule_info');
+      for (let i = 1; i < 43; i++) {
+        await docRef
+          .doc(i.toString())
+          .delete()
+          .catch((error) => {
+            response = error;
+          });
+      }
+      return response;
+    } catch (error) {
+      console.log('An error occurred on adding location: ', error);
       return error;
     }
   }
