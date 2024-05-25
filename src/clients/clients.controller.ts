@@ -88,7 +88,15 @@ export class ClientsController {
           });
         }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(
+        'An error occurred calling update on client progress: ',
+        error,
+      );
+      return response.status(HttpStatus.CONFLICT).json({
+        error,
+      });
+    }
   }
 
   @Post('/disable')
@@ -240,6 +248,20 @@ export class ClientsController {
           .status(HttpStatus.OK)
           .json({ message: 'deleteCustom Deleted' });
       });
+    } catch (error) {
+      console.log('An error occurred calling deleteCustom ', error);
+      return response.status(HttpStatus.CONFLICT).json({ error });
+    }
+  }
+
+  @Post('/update/attendance')
+  async updateAttendance(@Res() response, @Body() attendanceList) {
+    try {
+      await this.clientsService
+        .updateAttendance(attendanceList)
+        .then((resData) => {
+          return response.status(HttpStatus.OK).json(resData);
+        });
     } catch (error) {
       console.log('An error occurred calling deleteCustom ', error);
       return response.status(HttpStatus.CONFLICT).json({ error });

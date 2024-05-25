@@ -11,11 +11,10 @@ async function bootstrap() {
 
   app.use(
     cors({
-      methods: ['GET', 'PUT', 'POST'],
+      methods: ['GET', 'PUT', 'POST', 'PATCH'],
       origin: ['http://localhost:8100', 'http://127.0.0.1:8100'],
       credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization'], 
-
+      allowedHeaders: ['Content-Type', 'Authorization'],
     }),
   );
   app.use(express.urlencoded({ extended: true }));

@@ -361,4 +361,36 @@ export class ClientsService {
       return error;
     }
   }
+
+  async updateAttendance(attendanceList: any) {
+    try {
+      console.log('attendanceList ', attendanceList);
+      const allClients = [];
+      const updatedClients = [];
+      const docRef = await admin.firestore().collection('tkd_schedule_info');
+      await docRef.get().then((result) => {
+        result.forEach((doc) => {
+          allClients.push(doc.data());
+        });
+      });
+      console.log('All clients: ', allClients);
+
+      attendanceList.forEach(async (client) => {
+        const clientIndex = allClients.findIndex(
+          (cl) => cl.ClientID === client.ClientID,
+        );
+        allClients[clientIndex].Attendance.push({ date: client.date });
+        allClients[clientIndex].Attendance.shift();
+        updatedClients.push(allClients[clientIndex]);
+      });
+      updatedClients.forEach((data) => {
+        docRef.doc(data.ClientID).update(data);
+        // console.log(data.Attendance);
+      });
+      return { updatedClients: updatedClients };
+      // console.log(updatedClients);
+    } catch (error) {
+      console.log('An error occurred while updating attendance', error);
+    }
+  }
 }
