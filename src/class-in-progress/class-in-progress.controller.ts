@@ -63,6 +63,16 @@ export class ClassInProgressController {
     }
   }
 
+  @Get('/settings')
+  async getClassSettings(@Res() response) {
+    await this.classInProgressService.getClassStamps().then((resData) => {
+      console.log(resData);
+      return response.status(HttpStatus.OK).json({
+        resData,
+      });
+    })
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.classInProgressService.remove(+id);
