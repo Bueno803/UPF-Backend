@@ -162,6 +162,38 @@ export class ClassInProgressService {
     }
   }
 
+  async updateStudentReady(data: any) {
+    try {
+      const docRef = await admin
+        .firestore()
+        .collection('test_ready');
+
+        switch (data.readyField) {
+          case 'FormsRdy': {
+            docRef.doc(data.ClientID).update({FormsRdy: data.isReady});
+            break;
+          }
+          case 'BlocksRdy': {
+            docRef.doc(data.ClientID).update({BlocksRdy: data.isReady});
+            break;
+          }
+          case 'HandAtksRdy': {
+            docRef.doc(data.ClientID).update({HandAtksRdy: data.isReady});
+            break;
+          }
+          case 'KickssRdy': {
+            docRef.doc(data.ClientID).update({KickssRdy: data.isReady});
+            break;
+          }
+        }
+        return {status: "success"};
+        
+    } catch (error) {
+      console.log("An error occurred updating student readiness: ", error);
+      return {status: error};
+    }
+  }
+
   remove(id: number) {
     return `This action removes a #${id} classInProgress`;
   }

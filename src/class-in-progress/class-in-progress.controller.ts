@@ -73,6 +73,23 @@ export class ClassInProgressController {
     })
   }
 
+  @Patch('/update/ready')
+  async updateStudentReady(@Res() response, @Body() data) {
+    try {
+      await this.classInProgressService.updateStudentReady(data).then((resData) => {
+        return response.status(HttpStatus.OK).json({resData});
+      })
+    } catch (error) {
+      console.log(
+        'An error occurred calling update on Student Ready: ',
+        error,
+      );
+      return response.status(HttpStatus.CONFLICT).json({
+        error,
+      });
+    }
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.classInProgressService.remove(+id);
