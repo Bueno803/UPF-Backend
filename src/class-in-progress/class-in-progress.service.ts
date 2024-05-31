@@ -220,6 +220,21 @@ export class ClassInProgressService {
     }
   }
 
+  async updateStudentClass(data: any) {
+    try {
+      const docRef = await admin
+        .firestore()
+        .collection('tkd_belttest_progress');
+      data.forEach((student) => {
+        docRef.doc(student.ClientID).update(student);
+      });
+      return { status: 'success' };
+    } catch (error) {
+      console.log('An error occurred updating student readiness: ', error);
+      return { status: error };
+    }
+  }
+
   remove(id: number) {
     return `This action removes a #${id} classInProgress`;
   }

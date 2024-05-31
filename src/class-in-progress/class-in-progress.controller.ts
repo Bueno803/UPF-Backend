@@ -70,20 +70,35 @@ export class ClassInProgressController {
       return response.status(HttpStatus.OK).json({
         resData,
       });
-    })
+    });
   }
 
   @Patch('/update/ready')
   async updateStudentReady(@Res() response, @Body() data) {
     try {
-      await this.classInProgressService.updateStudentReady(data).then((resData) => {
-        return response.status(HttpStatus.OK).json({resData});
-      })
+      await this.classInProgressService
+        .updateStudentReady(data)
+        .then((resData) => {
+          return response.status(HttpStatus.OK).json({ resData });
+        });
     } catch (error) {
-      console.log(
-        'An error occurred calling update on Student Ready: ',
+      console.log('An error occurred calling update on Student Ready: ', error);
+      return response.status(HttpStatus.CONFLICT).json({
         error,
-      );
+      });
+    }
+  }
+
+  @Patch('/update/class')
+  async updateStudentClass(@Res() response, @Body() data) {
+    try {
+      await this.classInProgressService
+        .updateStudentClass(data)
+        .then((resData) => {
+          return response.status(HttpStatus.OK).json({ resData });
+        });
+    } catch (error) {
+      console.log('An error occurred calling update on Student Ready: ', error);
       return response.status(HttpStatus.CONFLICT).json({
         error,
       });
