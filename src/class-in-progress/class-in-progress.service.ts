@@ -222,12 +222,20 @@ export class ClassInProgressService {
 
   async updateStudentClass(data: any) {
     try {
+      console.log("updateStudentClass data ", data);
+      const docStampRef = await admin
+        .firestore()
+        .collection('last_class_time_stamp');
+
       const docRef = await admin
         .firestore()
         .collection('tkd_belttest_progress');
-      data.forEach((student) => {
+      data.class.forEach((student) => {
+        console.log("update student");
         docRef.doc(student.ClientID).update(student);
       });
+      console.log("update stamp");
+      docStampRef.doc(data.classID).update(data.stampClass);
       return { status: 'success' };
     } catch (error) {
       console.log('An error occurred updating student readiness: ', error);
