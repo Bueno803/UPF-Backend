@@ -112,6 +112,40 @@ export class ClientsService {
     }
   }
 
+  async purgeFromSchedule(clientID: string) {
+    try {
+      const isReadyRef = await admin.firestore().collection('test_ready');
+      const beltProgressRef = await admin
+        .firestore()
+        .collection('tkd_belttest_progress');
+      const scheduleRef = await admin
+        .firestore()
+        .collection('tkd_schedule_info');
+
+      await isReadyRef
+        .doc(clientID)
+        .delete()
+        .catch((error) => {
+          return error;
+        });
+      await beltProgressRef
+        .doc(clientID)
+        .delete()
+        .catch((error) => {
+          return error;
+        });
+      await scheduleRef
+        .doc(clientID)
+        .delete()
+        .catch((error) => {
+          return error;
+        });
+    } catch (error) {
+      console.log('An error occurred adding client to schedule: ', error);
+      return error;
+    }
+  }
+
   async createClientAnyway(clientInfo: any): Promise<any> {
     try {
       let response;
@@ -217,6 +251,7 @@ export class ClientsService {
               console.log('delete inside');
               poppedClients.push({ ClientID: clients.data().ClientID });
               docRef.doc(clients.data().ClientID).delete();
+              this.purgeFromSchedule(clients.data().ClientID);
             }
           });
         });
@@ -273,6 +308,9 @@ export class ClientsService {
     try {
       let response;
       const docRef = await admin.firestore().collection('upf_locations');
+      const docStampRef = await admin
+        .firestore()
+        .collection('last_class_time_stamp');
       await docRef
         .where('LocationName', '==', newLoc.LocationName)
         .get()
@@ -280,6 +318,7 @@ export class ClientsService {
           if (result.empty) {
             console.log('empty');
             const docId = await docRef.doc();
+            const docStampId = await docStampRef.doc();
             const newLocation = {
               id: docId.id,
               LocationName: newLoc.LocationName,
@@ -287,6 +326,24 @@ export class ClientsService {
             await docId.set(newLocation).then((data) => {
               console.log('set client: ', data);
               response = newLocation;
+            });
+            await docStampId.set({
+              ID: docStampId.id,
+              LocationID: docId.id,
+              Advanced: {
+                Page: 'Forms',
+                time: 'N/A',
+              },
+              Beginner: { Page: 'Forms', time: 'N/A' },
+              ['Lil-Tiger']: { Page: 'Forms', time: 'N/A' },
+              // Beginner: {
+              //   Page: "Forms",
+              //   time: "N/A"
+              // },
+              // Lil-Tiger: {
+              //   Page: "Forms",
+              //   time: "N/A"
+              // }
             });
           } else {
             console.log('not empty');
@@ -303,8 +360,12 @@ export class ClientsService {
 
   async removeLocation(newLoc: any) {
     try {
+      console.log('newloc: ', newLoc);
       let response;
       const docRef = await admin.firestore().collection('upf_locations');
+      const docStampRef = await admin
+        .firestore()
+        .collection('last_class_time_stamp');
       await docRef
         .where('LocationName', '==', newLoc.LocationName)
         .get()
@@ -312,12 +373,36 @@ export class ClientsService {
           if (result.empty) {
             response = { message: 'Location does not exist...' };
           } else {
+            // result.forEach((doc) => {
+            //   console.log('docRef ', doc.data());
+            // });
+            // console.log('docRef: ', result);
             await docRef
               .doc(newLoc.id)
               .delete()
               .catch((error) => {
                 response = error;
               });
+          }
+        });
+
+      await docStampRef
+        .where('LocationID', '==', newLoc.id)
+        .get()
+        .then(async (result) => {
+          if (result.empty) {
+            response = { message: 'Location does not exist...' };
+          } else {
+            result.forEach(async (doc) => {
+              // console.log('docStampRef ', doc);
+              // console.log('docStampRef', result);
+              await docStampRef
+                .doc(doc.data().ID)
+                .delete()
+                .catch((error) => {
+                  response = error;
+                });
+            });
           }
         });
       console.log('the response: ', response);
