@@ -73,6 +73,16 @@ export class ClassInProgressController {
     });
   }
 
+  @Get('/testlist')
+  async getTestList(@Res() response) {
+    await this.classInProgressService.getTestList().then((resData) => {
+      console.log(resData);
+      return response.status(HttpStatus.OK).json({
+        resData,
+      });
+    });
+  }
+
   @Patch('/update/ready')
   async updateStudentReady(@Res() response, @Body() data) {
     try {
