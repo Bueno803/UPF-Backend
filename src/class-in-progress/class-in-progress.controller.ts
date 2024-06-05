@@ -28,7 +28,6 @@ export class ClassInProgressController {
   async findAll(@Res() response) {
     try {
       await this.classInProgressService.findAll().then((resData) => {
-        console.log(resData);
         return response.status(HttpStatus.OK).json({ resData });
       });
     } catch (error) {
@@ -66,7 +65,6 @@ export class ClassInProgressController {
   @Get('/settings')
   async getClassSettings(@Res() response) {
     await this.classInProgressService.getClassStamps().then((resData) => {
-      console.log(resData);
       return response.status(HttpStatus.OK).json({
         resData,
       });
@@ -76,7 +74,6 @@ export class ClassInProgressController {
   @Get('/testlist')
   async getTestList(@Res() response) {
     await this.classInProgressService.getTestList().then((resData) => {
-      console.log(resData);
       return response.status(HttpStatus.OK).json({
         resData,
       });

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-// import { collection, getDocs, query } from 'firebase/firestore';
 
 @Injectable()
 export class ClientsService {
@@ -22,7 +21,6 @@ export class ClientsService {
   }
 
   async createClient(clientInfo: any): Promise<any> {
-    // check user existence?
     try {
       let response;
       const docRef = await admin.firestore().collection('client_space');
@@ -49,9 +47,7 @@ export class ClientsService {
           }
         });
       return response;
-    } catch (error) {
-      console.log('An error occured creating client: ', error);
-    }
+    } catch (error) {}
   }
 
   async addToSchedule(clientInfo: any) {
@@ -77,15 +73,12 @@ export class ClientsService {
         BeltLvl: clientInfo.BeltLvl,
         isAdvanced: classByAge,
         Present: false,
-        //want to keep track of the last 5 dates each student attended a class
         Attendance: [
-          {
-            date1: 'N/A',
-            date2: 'N/A',
-            date3: 'N/A',
-            date4: 'N/A',
-            date5: 'N/A',
-          },
+          { date: 'N/A' },
+          { date: 'N/A' },
+          { date: 'N/A' },
+          { date: 'N/A' },
+          { date: 'N/A' },
         ],
         Ready: false,
       });
@@ -100,10 +93,10 @@ export class ClientsService {
       });
       await isReadyRef.doc(clientInfo.ClientID).set({
         ClientID: clientInfo.ClientID,
-        FormsRdy: 1,
-        BlocksRdy: 1,
-        HandAtksRdy: 1,
-        KicksRdy: 1,
+        FormsRdy: false,
+        BlocksRdy: false,
+        HandAtksRdy: false,
+        KicksRdy: false,
       });
       return 'Successfully added to schedule!';
     } catch (error) {
@@ -154,8 +147,7 @@ export class ClientsService {
         .collection('client_space')
         .doc(clientInfo.ClientID)
         .set(clientInfo)
-        .then((resData) => {
-          console.log('set client anyway: ', resData);
+        .then(() => {
           response = { clientCreated: true };
         });
       response.schedule = await this.addToSchedule({
@@ -179,8 +171,6 @@ export class ClientsService {
       Object.keys(cleanClient).forEach((key) =>
         cleanClient[key] === undefined ? delete cleanClient[key] : {},
       );
-
-      console.log('Clean Client: ', cleanClient);
       docRef.doc(client.ClientID).update(cleanClient);
       return { updateStatus: true };
     } catch (error) {
@@ -234,28 +224,19 @@ export class ClientsService {
   async purgeInactives(deleteDate: number) {
     try {
       const poppedClients = [];
-      console.log(deleteDate);
       const docRef = await admin.firestore().collection('client_space');
       await docRef
         .where('isActive', '==', false)
         .get()
         .then(async (result) => {
           result.forEach((clients) => {
-            console.log(
-              'lastDisabled: ',
-              clients.data().lastDisabled,
-              ' deleteData: ',
-              deleteDate,
-            );
             if (clients.data().lastDisabled < deleteDate) {
-              console.log('delete inside');
               poppedClients.push({ ClientID: clients.data().ClientID });
               docRef.doc(clients.data().ClientID).delete();
               this.purgeFromSchedule(clients.data().ClientID);
             }
           });
         });
-      console.log(poppedClients);
       return poppedClients;
     } catch (error) {
       console.log('An error occurred purging clients: ', error);
@@ -277,7 +258,6 @@ export class ClientsService {
         });
       return response;
     } catch (error) {
-      console.log('An error occurred getting service locations: ', error);
       return { errorStatus: 'No locations', error: error };
     }
   }
@@ -290,12 +270,9 @@ export class ClientsService {
         .collection('service_type')
         .get()
         .then((data) => {
-          console.log('service_types data ', data);
           data.forEach((doc) => {
-            console.log('service_types doc ', doc);
             response.push(doc.data());
           });
-          // console.log('r ', response);
         });
       return response;
     } catch (error) {
@@ -316,15 +293,13 @@ export class ClientsService {
         .get()
         .then(async (result) => {
           if (result.empty) {
-            console.log('empty');
             const docId = await docRef.doc();
             const docStampId = await docStampRef.doc();
             const newLocation = {
               id: docId.id,
               LocationName: newLoc.LocationName,
             };
-            await docId.set(newLocation).then((data) => {
-              console.log('set client: ', data);
+            await docId.set(newLocation).then(() => {
               response = newLocation;
             });
             await docStampId.set({
@@ -336,21 +311,12 @@ export class ClientsService {
               },
               Beginner: { Page: 'Forms', time: 'N/A' },
               ['Lil-Tiger']: { Page: 'Forms', time: 'N/A' },
-              // Beginner: {
-              //   Page: "Forms",
-              //   time: "N/A"
-              // },
-              // Lil-Tiger: {
-              //   Page: "Forms",
-              //   time: "N/A"
-              // }
+              Misc: { Page: 'Forms', time: 'N/A' },
             });
           } else {
-            console.log('not empty');
             response = null;
           }
         });
-      console.log('returning: ', response);
       return response;
     } catch (error) {
       console.log('An error occurred on adding location: ', error);
@@ -360,7 +326,6 @@ export class ClientsService {
 
   async removeLocation(newLoc: any) {
     try {
-      console.log('newloc: ', newLoc);
       let response;
       const docRef = await admin.firestore().collection('upf_locations');
       const docStampRef = await admin
@@ -373,10 +338,6 @@ export class ClientsService {
           if (result.empty) {
             response = { message: 'Location does not exist...' };
           } else {
-            // result.forEach((doc) => {
-            //   console.log('docRef ', doc.data());
-            // });
-            // console.log('docRef: ', result);
             await docRef
               .doc(newLoc.id)
               .delete()
@@ -394,8 +355,6 @@ export class ClientsService {
             response = { message: 'Location does not exist...' };
           } else {
             result.forEach(async (doc) => {
-              // console.log('docStampRef ', doc);
-              // console.log('docStampRef', result);
               await docStampRef
                 .doc(doc.data().ID)
                 .delete()
@@ -405,7 +364,6 @@ export class ClientsService {
             });
           }
         });
-      console.log('the response: ', response);
       return response;
     } catch (error) {
       console.log('An error occurred on adding location: ', error);
@@ -449,7 +407,6 @@ export class ClientsService {
 
   async updateAttendance(attendanceList: any) {
     try {
-      console.log('attendanceList ', attendanceList);
       const allClients = [];
       const updatedClients = [];
       const docRef = await admin.firestore().collection('tkd_schedule_info');
@@ -458,8 +415,6 @@ export class ClientsService {
           allClients.push(doc.data());
         });
       });
-      console.log('All clients: ', allClients);
-
       attendanceList.forEach(async (client) => {
         const clientIndex = allClients.findIndex(
           (cl) => cl.ClientID === client.ClientID,
@@ -470,10 +425,8 @@ export class ClientsService {
       });
       updatedClients.forEach((data) => {
         docRef.doc(data.ClientID).update(data);
-        // console.log(data.Attendance);
       });
       return { updatedClients: updatedClients };
-      // console.log(updatedClients);
     } catch (error) {
       console.log('An error occurred while updating attendance', error);
     }

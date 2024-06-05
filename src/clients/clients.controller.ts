@@ -9,10 +9,7 @@ export class ClientsController {
   public async getClients(@Res() response) {
     try {
       await this.clientsService.getClients().then((resClients) => {
-        resClients.forEach((data) => {
-          console.log(data.FirstName, ' ', data.ClientID);
-        });
-        // console.log(resClients[0].FirstName, ' ', resClients[0].ClientID);
+        resClients.forEach(() => {});
         return response.status(HttpStatus.OK).json({
           clients: resClients,
         });
@@ -26,7 +23,6 @@ export class ClientsController {
   async createClient(@Res() response, @Body() userDto: any) {
     try {
       await this.clientsService.createClient(userDto).then((resClient) => {
-        console.log('resClient: ', resClient);
         if (resClient.clientCreated) {
           return response.status(HttpStatus.OK).json({
             message: 'User successfully created',
@@ -48,11 +44,9 @@ export class ClientsController {
   @Post('/create-force')
   async createClientAnyway(@Res() response, @Body() userDto: any) {
     try {
-      console.log('1createClientAnyway');
       await this.clientsService
         .createClientAnyway(userDto)
         .then((resClient) => {
-          console.log('resClient: ', resClient);
           if (resClient.clientCreated) {
             return response.status(HttpStatus.OK).json({
               message: 'User successfully created',
@@ -74,9 +68,6 @@ export class ClientsController {
   @Post('/update')
   async clientUpdate(@Res() response, @Body() client: any) {
     try {
-      console.log('UpdateClien');
-      // const { Client } = client;
-      console.log(client);
       await this.clientsService.updateClient(client).then((resData) => {
         if (resData.updateStatus) {
           return response.status(HttpStatus.OK).json({
@@ -102,17 +93,14 @@ export class ClientsController {
   @Post('/disable')
   async disableClient(@Res() response, @Body() data: any) {
     try {
-      console.log('/disable client');
       await this.clientsService
         .disableClient(data.ClientID, data.disabledTimeStamp)
         .then((resData) => {
           if (resData.updateStatus) {
-            console.log('disableClient: ', resData);
             return response.status(HttpStatus.OK).json({
               resData,
             });
           } else {
-            console.log('disableClient: ', resData);
             return response.status(HttpStatus.CONFLICT).json({
               resData,
             });
@@ -124,15 +112,12 @@ export class ClientsController {
   @Post('/enable')
   async enableClient(@Res() response, @Body() data: any) {
     try {
-      console.log('/disable client');
       await this.clientsService.enableClient(data.ClientID).then((resData) => {
         if (resData.updateStatus) {
-          console.log('disableClient: ', resData);
           return response.status(HttpStatus.OK).json({
             resData,
           });
         } else {
-          console.log('disableClient: ', resData);
           return response.status(HttpStatus.CONFLICT).json({
             resData,
           });
@@ -144,8 +129,6 @@ export class ClientsController {
   @Post('/purge')
   async purgeInactives(@Res() response, @Body() data) {
     try {
-      console.log('/purge');
-      console.log(data);
       await this.clientsService
         .purgeInactives(data.dateData)
         .then((resData) => {
@@ -160,12 +143,10 @@ export class ClientsController {
   @Get('/locations')
   async getLocations(@Res() res) {
     try {
-      console.log('/locations');
       await this.clientsService.getLocations().then((locations) => {
         if (res.errorStatus) {
           return res.status(HttpStatus.CONFLICT).json({ locations });
         }
-        // console.log('locs: ', locations);
         return res.status(HttpStatus.OK).json({ locations });
       });
     } catch (error) {
@@ -177,12 +158,10 @@ export class ClientsController {
   @Get('/servicetypes')
   async getServiceTypes(@Res() response) {
     try {
-      console.log('/servicetypes');
       await this.clientsService.getServiceTypes().then((serviceTypes) => {
         if (response.errorStatus) {
           return response.status(HttpStatus.CONFLICT).json({ serviceTypes });
         }
-        // console.log('locs: ', locations);
         return response.status(HttpStatus.OK).json({ serviceTypes });
       });
     } catch (error) {
@@ -212,7 +191,6 @@ export class ClientsController {
   @Post('/locations/remove')
   async removeLocation(@Res() response, @Body() location: any) {
     try {
-      console.log('remove loc: ', location);
       await this.clientsService.removeLocation(location).then((resData) => {
         if (resData != null) {
           return response.status(HttpStatus.CONFLICT).json(resData);
@@ -242,7 +220,6 @@ export class ClientsController {
   @Post('/custom/delete')
   async deleteCustom(@Res() response) {
     try {
-      // console.log('remove loc: ', location);
       await this.clientsService.deleteCustom().then(() => {
         return response
           .status(HttpStatus.OK)

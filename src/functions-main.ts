@@ -15,14 +15,11 @@
 //   return app.init();
 // };
 
-
-
 // createNestServer(server)
 //     .then(v => console.log('Nest Ready'))
 //     .catch(err => console.error('Nest broken', err));
 
 // export const api = functions.https.onRequest(server);
-
 
 // //---------------------------------------------------------------------------------------------------------
 
@@ -39,11 +36,10 @@
 
 //   app.use(
 //     cors({
-//       methods: ['GET', 'PUT', 'POST'],
+//       methods: ['GET', 'PUT', 'POST', 'PATCH'],
 //       origin: ['http://localhost:8100', 'http://127.0.0.1:8100'],
 //       credentials: true,
-//       allowedHeaders: ['Content-Type', 'Authorization'], 
-
+//       allowedHeaders: ['Content-Type', 'Authorization'],
 //     }),
 //   );
 //   app.use(express.urlencoded({ extended: true }));

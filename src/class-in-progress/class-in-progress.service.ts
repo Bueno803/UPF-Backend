@@ -54,9 +54,7 @@ export class ClassInProgressService {
   async getTestList() {
     try {
       const response = [];
-      const docRef = await admin
-        .firestore()
-        .collection('test_ready');
+      const docRef = await admin.firestore().collection('test_ready');
       await docRef.get().then(async (result) => {
         result.forEach((doc) => {
           response.push(doc.data());
@@ -240,7 +238,7 @@ export class ClassInProgressService {
 
   async updateStudentClass(data: any) {
     try {
-      console.log("updateStudentClass data ", data);
+      console.log('updateStudentClass data ', data);
       const docStampRef = await admin
         .firestore()
         .collection('last_class_time_stamp');
@@ -249,11 +247,11 @@ export class ClassInProgressService {
         .firestore()
         .collection('tkd_belttest_progress');
       data.class.forEach((student) => {
-        console.log("update student");
+        console.log('update student');
         docRef.doc(student.ClientID).update(student);
       });
-      this.updateAttendance(data.class);
-      console.log("update stamp");
+      this.updateAttendance(data.class, data.classTime);
+      console.log('update stamp');
       docStampRef.doc(data.classID).update(data.stampClass);
       return { status: 'success' };
     } catch (error) {
@@ -262,7 +260,7 @@ export class ClassInProgressService {
     }
   }
 
-  async updateAttendance(attendanceList: any) {
+  async updateAttendance(attendanceList: any, date: string) {
     try {
       console.log('attendanceList ', attendanceList);
       const allClients = [];
@@ -279,13 +277,17 @@ export class ClassInProgressService {
         const clientIndex = allClients.findIndex(
           (cl) => cl.ClientID === client.ClientID,
         );
-        allClients[clientIndex].Attendance.push({ date: new Date() });
+        allClients[clientIndex].Attendance.push({
+          date: date,
+        });
         allClients[clientIndex].Attendance.shift();
         updatedClients.push(allClients[clientIndex]);
       });
+      console.log('updated client', updatedClients);
       updatedClients.forEach((data) => {
+        console.log('data ', data);
         docRef.doc(data.ClientID).update(data);
-        // console.log(data.Attendance);
+        console.log('data.Attendance ', data.Attendance);
       });
       return { updatedClients: updatedClients };
       // console.log(updatedClients);
