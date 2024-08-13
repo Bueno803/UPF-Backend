@@ -1,3 +1,11 @@
+/*
+ *   To deploy backendAPI run below on CLI
+ *   npm run deploy
+ * 
+ * To delete run 'firebase functions:delete *function-name*' example below
+ * firebase functions:delete api
+ * 
+ */
 // import { NestFactory } from '@nestjs/core';
 // import { ExpressAdapter } from '@nestjs/platform-express';
 // import { AppModule } from './app.module';

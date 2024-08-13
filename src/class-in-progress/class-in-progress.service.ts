@@ -43,7 +43,6 @@ export class ClassInProgressService {
         lilInfo: await this.getLilTechInfo(),
         advInfo: await this.getAdvTechInfo(),
       };
-      console.log('TechInfo ', TechInfo);
       return { classStamp: response, TechInfo: TechInfo };
     } catch (error) {
       console.log('An error occurred fetching class stamps: ', error);
@@ -87,33 +86,25 @@ export class ClassInProgressService {
         .collection('lil_kickstid_info');
 
       await formsDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           formsResponse.push(doc.data());
         });
       });
 
       await handAtksDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           handAtksResponse.push(doc.data());
         });
       });
 
       await blocksDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           blocksResponse.push(doc.data());
         });
       });
 
       await kicksDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           kicksResponse.push(doc.data());
         });
       });
@@ -149,33 +140,25 @@ export class ClassInProgressService {
         .collection('adv_kickstid_info');
 
       await formsDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           formsResponse.push(doc.data());
         });
       });
 
       await handAtksDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           handAtksResponse.push(doc.data());
         });
       });
 
       await blocksDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           blocksResponse.push(doc.data());
         });
       });
 
       await kicksDocRef.get().then(async (result) => {
-        console.log('result ', result);
         result.forEach((doc) => {
-          console.log('doc ', doc);
           kicksResponse.push(doc.data());
         });
       });
@@ -238,7 +221,6 @@ export class ClassInProgressService {
 
   async updateStudentClass(data: any) {
     try {
-      console.log('updateStudentClass data ', data);
       const docStampRef = await admin
         .firestore()
         .collection('last_class_time_stamp');
@@ -247,11 +229,9 @@ export class ClassInProgressService {
         .firestore()
         .collection('tkd_belttest_progress');
       data.class.forEach((student) => {
-        console.log('update student');
         docRef.doc(student.ClientID).update(student);
       });
       this.updateAttendance(data.class, data.classTime);
-      console.log('update stamp');
       docStampRef.doc(data.classID).update(data.stampClass);
       return { status: 'success' };
     } catch (error) {
@@ -262,7 +242,6 @@ export class ClassInProgressService {
 
   async updateAttendance(attendanceList: any, date: string) {
     try {
-      console.log('attendanceList ', attendanceList);
       const allClients = [];
       const updatedClients = [];
       const docRef = await admin.firestore().collection('tkd_schedule_info');
@@ -271,26 +250,29 @@ export class ClassInProgressService {
           allClients.push(doc.data());
         });
       });
-      console.log('All clients: ', allClients);
 
       attendanceList.forEach(async (client) => {
         const clientIndex = allClients.findIndex(
           (cl) => cl.ClientID === client.ClientID,
         );
-        allClients[clientIndex].Attendance.push({
-          date: date,
+        if (
+          allClients[clientIndex].Attendance[
+            allClients[clientIndex].Attendance.length - 1
+          ].date != date
+        ) {
+          allClients[clientIndex].Attendance.push({
+            date: date,
+          });
+          allClients[clientIndex].Attendance.shift();
+          updatedClients.push(allClients[clientIndex]);
+        }
+      });
+      if (updatedClients.length > 0) {
+        updatedClients.forEach((data) => {
+          docRef.doc(data.ClientID).update(data);
         });
-        allClients[clientIndex].Attendance.shift();
-        updatedClients.push(allClients[clientIndex]);
-      });
-      console.log('updated client', updatedClients);
-      updatedClients.forEach((data) => {
-        console.log('data ', data);
-        docRef.doc(data.ClientID).update(data);
-        console.log('data.Attendance ', data.Attendance);
-      });
+      }
       return { updatedClients: updatedClients };
-      // console.log(updatedClients);
     } catch (error) {
       console.log('An error occurred while updating attendance', error);
     }

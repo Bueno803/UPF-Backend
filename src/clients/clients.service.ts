@@ -165,13 +165,19 @@ export class ClientsService {
 
   async updateClient(client: any) {
     try {
-      const docRef = await admin.firestore().collection('client_space');
+      console.log('Client data to update to: ', client);
+      const clientRef = await admin.firestore().collection('client_space');
+
+      const beltProgressRef = await admin
+        .firestore()
+        .collection('tkd_belttest_progress');
       const cleanClient = client;
 
       Object.keys(cleanClient).forEach((key) =>
         cleanClient[key] === undefined ? delete cleanClient[key] : {},
       );
-      docRef.doc(client.ClientID).update(cleanClient);
+      clientRef.doc(client.ClientID).update(cleanClient);
+      beltProgressRef.doc(client.ClientID).update({ BeltLvl: client.BeltLvl });
       return { updateStatus: true };
     } catch (error) {
       console.log('An error occurred update client: ', error);
@@ -405,30 +411,35 @@ export class ClientsService {
     }
   }
 
-  async updateAttendance(attendanceList: any) {
-    try {
-      const allClients = [];
-      const updatedClients = [];
-      const docRef = await admin.firestore().collection('tkd_schedule_info');
-      await docRef.get().then((result) => {
-        result.forEach((doc) => {
-          allClients.push(doc.data());
-        });
-      });
-      attendanceList.forEach(async (client) => {
-        const clientIndex = allClients.findIndex(
-          (cl) => cl.ClientID === client.ClientID,
-        );
-        allClients[clientIndex].Attendance.push({ date: client.date });
-        allClients[clientIndex].Attendance.shift();
-        updatedClients.push(allClients[clientIndex]);
-      });
-      updatedClients.forEach((data) => {
-        docRef.doc(data.ClientID).update(data);
-      });
-      return { updatedClients: updatedClients };
-    } catch (error) {
-      console.log('An error occurred while updating attendance', error);
-    }
-  }
+  // async updateAttendance(attendanceList: any) {
+  //   try {
+  //     const allClients = [];
+  //     const updatedClients = [];
+  //     const docRef = await admin.firestore().collection('tkd_schedule_info');
+  //     await docRef.get().then((result) => {
+  //       result.forEach((doc) => {
+  //         allClients.push(doc.data());
+  //       });
+  //     });
+  //     attendanceList.forEach(async (client) => {
+  //       const clientIndex = allClients.findIndex(
+  //         (cl) => cl.ClientID === client.ClientID,
+  //       );
+  //       console.log(
+  //         allClients[clientIndex].Attendance[
+  //           allClients[clientIndex].Attendance.length
+  //         ].date,
+  //       );
+  //       // allClients[clientIndex].Attendance.push({ date: client.date });
+  //       // allClients[clientIndex].Attendance.shift();
+  //       // updatedClients.push(allClients[clientIndex]);
+  //     });
+  //     // updatedClients.forEach((data) => {
+  //     //   docRef.doc(data.ClientID).update(data);
+  //     // });
+  //     return { updatedClients: updatedClients };
+  //   } catch (error) {
+  //     console.log('An error occurred while updating attendance', error);
+  //   }
+  // }
 }

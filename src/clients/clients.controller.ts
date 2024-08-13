@@ -231,17 +231,17 @@ export class ClientsController {
     }
   }
 
-  @Post('/update/attendance')
-  async updateAttendance(@Res() response, @Body() attendanceList) {
-    try {
-      await this.clientsService
-        .updateAttendance(attendanceList)
-        .then((resData) => {
-          return response.status(HttpStatus.OK).json(resData);
-        });
-    } catch (error) {
-      console.log('An error occurred calling deleteCustom ', error);
-      return response.status(HttpStatus.CONFLICT).json({ error });
-    }
-  }
+  // @Post('/update/attendance')
+  // async updateAttendance(@Res() response, @Body() attendanceList) {
+  //   try {
+  //     await this.clientsService
+  //       .updateAttendance(attendanceList)
+  //       .then((resData) => {
+  //         return response.status(HttpStatus.OK).json(resData);
+  //       });
+  //   } catch (error) {
+  //     console.log('An error occurred calling deleteCustom ', error);
+  //     return response.status(HttpStatus.CONFLICT).json({ error });
+  //   }
+  // }
 }
