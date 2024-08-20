@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateClassInProgressDto } from './dto/create-class-in-progress.dto';
-// import { UpdateClassInProgressDto } from './dto/update-class-in-progress.dto';
 import * as admin from 'firebase-admin';
 
 @Injectable()
@@ -24,6 +22,29 @@ export class ClassInProgressService {
     } catch (error) {
       console.log('An error occurred fetching student progress: ', error);
       return error;
+    }
+  }
+
+  async getAllTechInfo() {
+    try {
+      const response = [];
+      const docRef = await admin
+        .firestore()
+        .collection('tkd_belttest_progress');
+
+      await docRef.get().then(async (result) => {
+        result.forEach((doc) => {
+          response.push(doc.data());
+        });
+      });
+
+      const TechInfo = {
+        lilInfo: await this.getLilTechInfo(),
+        advInfo: await this.getAdvTechInfo(),
+      };
+      return { TechInfo, response };
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -275,6 +296,26 @@ export class ClassInProgressService {
       return { updatedClients: updatedClients };
     } catch (error) {
       console.log('An error occurred while updating attendance', error);
+    }
+  }
+
+  async emailSentFlag(data: any) {
+    try {
+      // docRef.doc(data.ClientID).update({ FormsRdy: data.isReady });
+
+      await admin
+        .firestore()
+        .collection('test_ready')
+        .doc(data.ClientID)
+        .update({ emailSent: data.emailSent });
+
+      return { message: 'Successfully updated Client' };
+    } catch (error) {
+      console.error(error);
+      return {
+        message: 'An error occured during the update of the `emailSent` flag',
+        error: error,
+      };
     }
   }
 

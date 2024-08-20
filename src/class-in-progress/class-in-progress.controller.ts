@@ -71,6 +71,15 @@ export class ClassInProgressController {
     });
   }
 
+  @Get('/TechInfo')
+  async getAllTechInfo(@Res() response) {
+    await this.classInProgressService.getAllTechInfo().then((resData) => {
+      return response.status(HttpStatus.OK).json({
+        resData,
+      });
+    });
+  }
+
   @Get('/testlist')
   async getTestList(@Res() response) {
     await this.classInProgressService.getTestList().then((resData) => {
@@ -78,6 +87,22 @@ export class ClassInProgressController {
         resData,
       });
     });
+  }
+
+  @Patch('/emailSentFlag')
+  async emailSentFlag(@Res() response, @Body() data) {
+    try {
+      await this.classInProgressService.emailSentFlag(data).then((resData) => {
+        if (resData.error) {
+          return response.status(HttpStatus.CONFLICT).json({ resData });
+        } else {
+          return response.status(HttpStatus.OK).json({ resData });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      return response.status(HttpStatus.CONFLICT).json({ error });
+    }
   }
 
   @Patch('/update/ready')
