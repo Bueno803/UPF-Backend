@@ -165,22 +165,48 @@ export class ClientsService {
 
   async updateClient(client: any) {
     try {
-      console.log('Client data to update to: ', client);
-      const clientRef = await admin.firestore().collection('client_space');
-
-      const beltProgressRef = await admin
+      // Firestore references
+      const clientRef = admin
         .firestore()
-        .collection('tkd_belttest_progress');
-      const cleanClient = client;
+        .collection('client_space')
+        .doc(client.ClientID);
+      const beltProgressRef = admin
+        .firestore()
+        .collection('tkd_belttest_progress')
+        .doc(client.ClientID);
+      const testReadyRef = admin
+        .firestore()
+        .collection('test_ready')
+        .doc(client.ClientID);
 
+      // Fetch the current client data from 'client_space'
+      const clientSnapshot = await clientRef.get();
+      const currentClientData = clientSnapshot.data();
+
+      // Clean the client object by removing undefined values
+      const cleanClient = { ...client };
       Object.keys(cleanClient).forEach((key) =>
         cleanClient[key] === undefined ? delete cleanClient[key] : {},
       );
-      clientRef.doc(client.ClientID).update(cleanClient);
-      beltProgressRef.doc(client.ClientID).update({ BeltLvl: client.BeltLvl });
+
+      // Update 'client_space' collection with sanitized data
+      await clientRef.update(cleanClient);
+
+      // Check if 'beltLvl' has changed
+      if (client.BeltLvl && currentClientData.BeltLvl !== client.BeltLvl) {
+        // Update 'tkd_belttest_progress' and 'test_ready' collections
+        await beltProgressRef.update({ BeltLvl: client.BeltLvl });
+        await testReadyRef.update({
+          BlocksRdy: false,
+          FormsRdy: false,
+          HandAtksRdy: false,
+          KicksRdy: false,
+        });
+      }
+
       return { updateStatus: true };
     } catch (error) {
-      console.log('An error occurred update client: ', error);
+      console.error('An error occurred while updating the client: ', error);
       return { updateStatus: false, error };
     }
   }

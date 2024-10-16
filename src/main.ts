@@ -11,7 +11,12 @@ export const createNestServer = async (expressInstance) => {
     AppModule,
     new ExpressAdapter(expressInstance),
   );
-  app.enableCors();
+  // Enable CORS with explicit configuration
+  app.enableCors({
+    origin: true, // You can replace 'true' with your specific allowed origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
   return app.init();
 };
 
