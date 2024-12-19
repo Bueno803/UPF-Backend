@@ -12,7 +12,12 @@ async function bootstrap() {
   app.use(
     cors({
       methods: ['GET', 'PUT', 'POST', 'PATCH'],
-      origin: ['http://localhost:8100', 'http://127.0.0.1:8100'],
+      origin: [
+        'http://localhost:8100',
+        'http://127.0.0.1:8100',
+        'http://localhost:3001',
+        'http://127.0.0.1:3001',
+      ],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization'],
     }),
